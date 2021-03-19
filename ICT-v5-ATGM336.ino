@@ -50,7 +50,7 @@ int gps_speed = 0;
 volatile bool proceed = false;
 
 #include "TelemFunctions.h" // Various telemetry functions
-#include "Timing2.h" // Scheduling
+#include "Timing.h" // Scheduling
 
 ISR(TIMER1_COMPA_vect)
 { proceed = true; }

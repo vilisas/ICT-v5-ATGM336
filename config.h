@@ -7,7 +7,6 @@
 
 #ifndef CONFIG_H_
 #define CONFIG_H_
-#include <pins_arduino.h>
 #include "local_config.h"
 
 
@@ -23,8 +22,13 @@
 #define WSPR_FREQ     14097192UL      // <<<<< SET TX FREQUENCY HERE
 
 #ifdef DEBUG_MODE
-# define PIN_SOFTSERIAL_TX PIN_SPI_MOSI // Pin 11
-# define DEBUG_BAUDRATE 9600
+# define PIN_SOFTSERIAL_TX 11 // PIN_SPI_MOSI
+# ifndef DEBUG_BAUDRATE
+#  define DEBUG_BAUDRATE 9600
+# endif
 #endif
+
+// uncomment this to enable TX every 2 mins (test timing) or define it in local_config.h
+//#define USE_TEST_TIMING 1
 
 #endif /* CONFIG_H_ */
