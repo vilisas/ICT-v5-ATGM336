@@ -39,7 +39,7 @@
 		<link>
 			<name>core/variant</name>
 			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/avr/1.8.3/variants/standard</locationURI>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/avr/1.8.3/variants/eightanaloginputs</locationURI>
 		</link>
 		<link>
 			<name>libraries/Etherkit_Si5351-2.1.4</name>
@@ -50,6 +50,11 @@
 			<name>libraries/JTEncode-master</name>
 			<type>2</type>
 			<location>/opt/Arduino/libraries/JTEncode-master</location>
+		</link>
+		<link>
+			<name>libraries/SendOnlySoftwareSerial</name>
+			<type>2</type>
+			<location>/opt/Arduino/libraries/SendOnlySoftwareSerial</location>
 		</link>
 		<link>
 			<name>libraries/Sodaq_wdt</name>

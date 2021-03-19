@@ -7,7 +7,9 @@
 
 #ifndef CONFIG_H_
 #define CONFIG_H_
+#include <pins_arduino.h>
 #include "local_config.h"
+
 
 #ifndef CONFIG_CALLSIGN
 #define CONFIG_CALLSIGN "N0CALL" // set your callsign in local_config.h file
@@ -20,5 +22,9 @@
 //#define WSPR_FREQ     10140285UL
 #define WSPR_FREQ     14097192UL      // <<<<< SET TX FREQUENCY HERE
 
+#ifdef DEBUG_MODE
+# define PIN_SOFTSERIAL_TX PIN_SPI_MOSI // Pin 11
+# define DEBUG_BAUDRATE 9600
+#endif
 
 #endif /* CONFIG_H_ */

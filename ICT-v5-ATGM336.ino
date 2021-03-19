@@ -14,8 +14,14 @@
 #include <TimeLib.h>
 #include <TinyGPS++.h>
 #include <avr/power.h>
+#include "debug.h"
 #include "config.h"
 
+
+#ifdef DEBUG_MODE
+# include <SendOnlySoftwareSerial.h>
+SendOnlySoftwareSerial debugPort(PIN_SOFTSERIAL_TX);
+#endif
 
 // Enumerations
 enum mode {MODE_WSPR};
@@ -77,6 +83,12 @@ void setup()
   digitalWrite(A2, HIGH);
   digitalWrite(A3, HIGH); 
 
+#ifdef DEBUG_MODE
+  debugPort.begin(DEBUG_BAUDRATE);
+  debug("");
+  debug("Power on");
+#endif
+
   Serial.begin(9600);
   delay(1000); 
   Serial.write("$PCAS04,1*18\r\n"); //Sets navsystem of the ATGM to GPS only
@@ -102,4 +114,5 @@ void setup()
     if (timeStatus() == timeNotSet) // Only sets time if already not done previously
   { setGPStime(); } // Sets system time to GPS UTC time for sync
     if (gps.location.isValid()) TXtiming(); // Process timing 
+    debug("loop");
   }
