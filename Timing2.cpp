@@ -6,6 +6,7 @@
 #include <TimeLib.h>
 #include "TelemFunctions.h"
 #include "config.h"
+#include "debug.h"
 
 extern unsigned long freq;
 extern bool telemetry_set;
@@ -19,6 +20,7 @@ void TXtiming() // Timing
 		setGPStime();
 		if ((minute() % 02 == 0) && (second() <= 2)) // TX WSPR standard message
 				{
+			debug(F("Sending WSPR message"));
 			telemetry_set = true;
 			loc4calc(); // Get position and update 4-char locator, 6-char locator and last 2 chars of 8-char locator
 			call_telem(); // Update WSPR telemetry callsign based on previous information : position and altitude in meters

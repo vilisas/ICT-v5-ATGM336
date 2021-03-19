@@ -21,6 +21,8 @@
 #ifdef DEBUG_MODE
 # include <SendOnlySoftwareSerial.h>
 SendOnlySoftwareSerial debugPort(PIN_SOFTSERIAL_TX);
+unsigned long l_millis = 0;
+
 #endif
 
 // Enumerations
@@ -106,13 +108,25 @@ void setup()
   sodaq_wdt_reset();
   }
 
-  void loop() 
-  {
-    sodaq_wdt_reset();
-    while (Serial.available() > 0)
-    if (gps.encode(Serial.read())) // GPS related functions need to be in here to work with tinyGPS Plus library
-    if (timeStatus() == timeNotSet) // Only sets time if already not done previously
-  { setGPStime(); } // Sets system time to GPS UTC time for sync
-    if (gps.location.isValid()) TXtiming(); // Process timing 
-    debug("loop");
-  }
+void loop() {
+	sodaq_wdt_reset();
+	while (Serial.available() > 0)
+		if (gps.encode(Serial.read())) // GPS related functions need to be in here to work with tinyGPS Plus library
+			if (timeStatus() == timeNotSet) // Only sets time if already not done previously
+					{
+				setGPStime();
+				debug(F("GPS time not set"));
+			} // Sets system time to GPS UTC time for sync
+	if (gps.location.isValid()){
+		TXtiming(); // Process timing
+	}
+#ifdef DEBUG_MODE
+	char buffer[100];
+//	memset(buffer, 0, sizeof(buffer));
+	if ((millis() - l_millis) >= 2000){
+		sprintf(buffer, " %s / %02d:%02d:%02d gps.l.valid=%d\r\n", loc4, Hour, Minute, Second,gps.location.isValid());
+		debugPort.write(buffer);
+		l_millis = millis();
+	}
+#endif
+}

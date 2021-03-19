@@ -1,6 +1,12 @@
 /*
-   Telemetry functions
-*/
+ * TelemFunctions.h
+ *
+ * Telemetry functions
+ *
+ */
+
+#ifndef TELEMFUNCTIONS_H
+#define TELEMFUNCTIONS_H
 
 void setGPStime();
 void loc4calc();
@@ -13,3 +19,5 @@ void rf_on();
 void rf_off();
 void GPS_VCC_on();
 void GPS_VCC_off();
+
+#endif
