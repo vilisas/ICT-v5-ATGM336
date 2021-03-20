@@ -9,5 +9,7 @@
 #define DEBUG_H_
 #include <Arduino.h>
 void debug(const String &tekstas);
+void debugReadBoardSensors();
+
 
 #endif /* DEBUG_H_ */

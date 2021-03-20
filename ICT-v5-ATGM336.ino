@@ -23,6 +23,9 @@
 SendOnlySoftwareSerial debugPort(PIN_SOFTSERIAL_TX);
 unsigned long l_millis = 0;
 
+// just for debuging purposes
+int board_voltage_mv = 0;
+int board_temperature = 0;
 #endif
 
 // Enumerations
@@ -122,9 +125,13 @@ void loop() {
 	}
 #ifdef DEBUG_MODE
 	char buffer[100];
-//	memset(buffer, 0, sizeof(buffer));
-	if ((millis() - l_millis) >= 2000){
-		sprintf(buffer, " %s / %02d:%02d:%02d gps.l.valid=%d\r\n", loc4, Hour, Minute, Second,gps.location.isValid());
+	char vcc[5] = {0};
+	dtostrf((board_voltage_mv / 100.0), 4, 2, vcc);
+	if ((millis() - l_millis) >= 1000){
+		if (second() == 10) debugReadBoardSensors();
+		sprintf(buffer, " %s / %02d:%02d:%02d gps.l.valid=%d speed: %d temp: %d, VCC: %s\r\n",
+				loc4, hour(), minute(), second(),gps.location.isValid(), int(gps.speed.kmph()), board_temperature,
+				vcc);
 		debugPort.write(buffer);
 		l_millis = millis();
 	}

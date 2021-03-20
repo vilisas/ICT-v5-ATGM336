@@ -13,11 +13,6 @@ extern TinyGPSPlus gps;
 extern Si5351 si5351;
 extern JTEncode jtencode;
 
-/*
-extern byte Hour, Minute, Second; // Used for timing
-extern long lat, lon, oldlat, oldlon; // Used for location
-*/
-
 extern unsigned long freq;
 extern char call[]; // WSPR Standard callsign
 extern char call_telemetry[]; // WSPR telemetry callsign
@@ -36,6 +31,13 @@ extern int Sats;
 extern int gps_speed;
 extern volatile bool proceed;
 
+#ifdef DEBUG_MODE
+
+#include "debug.h"
+#include "SendOnlySoftwareSerial.h"
+extern SendOnlySoftwareSerial debugPort;
+
+#endif
 
 void setGPStime() // Sets the system time from the GPS
   {
@@ -203,17 +205,38 @@ void setModeWSPR_telem()
 void encode() // Loop through the string, transmitting one character at a time
 {
   uint8_t i;
+  unsigned long ms, ms_end = millis();
+  unsigned long ms_start = millis();
   for (i = 0; i < symbol_count; i++) // Now transmit the channel symbols
 {
     //si5351.output_enable(SI5351_CLK0, 1); // Turn off the CLK0 output
     //si5351.set_freq_manual((freq * 100) + (tx_buffer[i] * tone_spacing),87500000000ULL,SI5351_CLK0);
-    si5351.set_freq((freq * 100) + (tx_buffer[i] * tone_spacing),SI5351_CLK0);
+	si5351.set_freq((freq * 100) + (tx_buffer[i] * tone_spacing),SI5351_CLK0);
     proceed = false;
+    ms = millis();
+#ifdef DEBUG_MODE
+# ifdef DEBUG_WSPR
+    // print debug stuff only, when already tx'ing and there is some spare time to do so
+    debugPort.print(tx_buffer[i] * tone_spacing);	// print offsets to debug port
+    debugPort.print(", ");
+    debugPort.println(ms - ms_end);					// print previous cycle length in milliseconds
+# endif
+#endif
+
     while (!proceed);
     sodaq_wdt_reset();
+    ms_end = millis();
 }
   si5351.output_enable(SI5351_CLK0, 0); // Turn off the CLK0 output
   si5351.set_clock_pwr(SI5351_CLK0, 0);  // Turn off the CLK0 clock
+#ifdef DEBUG_MODE
+# ifdef DEBUG_WSPR
+  debugPort.print("Cycle length: ");
+  debugPort.print(ms_end - ms_start);
+  debugPort.println(" ms.");
+
+# endif
+#endif
 }
 
 void rf_on() // Turn on the high-side switch, activating the transmitter
@@ -230,6 +253,7 @@ void rf_on() // Turn on the high-side switch, activating the transmitter
   si5351.set_clock_pwr(SI5351_CLK2, 0);  // Turn off the CLK2 clock
   si5351.output_enable(SI5351_CLK2, 0);  // Turn off the CLK2 output
   si5351.drive_strength(SI5351_CLK0, SI5351_DRIVE_8MA); // Set for max power if desired. Check datasheet.
+
   si5351.output_enable(SI5351_CLK0, 0);  // Disable the clock initially
 }
 
