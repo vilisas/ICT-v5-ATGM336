@@ -23,11 +23,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Sodaq_wdt/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/TinyGPSPlus-1.0.2/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Etherkit_Si5351-2.1.4/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/JTEncode-master/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Time-master}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/SendOnlySoftwareSerial}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Etherkit_Si5351-2.1.4/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.800316834" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -37,11 +37,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Sodaq_wdt/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/TinyGPSPlus-1.0.2/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Etherkit_Si5351-2.1.4/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/JTEncode-master/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Time-master}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/SendOnlySoftwareSerial}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Etherkit_Si5351-2.1.4/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.377262768" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -51,11 +51,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Sodaq_wdt/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/TinyGPSPlus-1.0.2/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Etherkit_Si5351-2.1.4/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/JTEncode-master/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Time-master}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/SendOnlySoftwareSerial}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Etherkit_Si5351-2.1.4/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LKB4/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.666572088" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

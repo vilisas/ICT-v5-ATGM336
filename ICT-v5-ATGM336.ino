@@ -26,6 +26,8 @@ unsigned long l_millis = 0;
 // just for debuging purposes
 int board_voltage_mv = 0;
 int board_temperature = 0;
+char vcc_str[6];
+
 #endif
 
 // Enumerations
@@ -36,7 +38,7 @@ JTEncode jtencode;
 
 // Global variables
 unsigned long freq;
-const char call[] = CONFIG_CALLSIGN; // WSPR Standard callsign
+char call[] = CONFIG_CALLSIGN; // WSPR Standard callsign
 char call_telemetry[7]; // WSPR telemetry callsign
 char loc_telemetry[5]; // WSPR telemetry locator
 uint8_t dbm_telemetry; // WSPR telemetry dbm
@@ -51,12 +53,17 @@ bool telemetry_set = false;
 int Sats = 0;
 int gps_speed = 0;
 volatile bool proceed = false;
+bool flip = false;
 
 #include "TelemFunctions.h" // Various telemetry functions
 #include "Timing.h" // Scheduling
 
 ISR(TIMER1_COMPA_vect)
 { proceed = true; }
+
+void tx_on();
+void tx_off();
+
 
 void setup()
 {
@@ -65,7 +72,6 @@ void setup()
   //clock_prescale_set(clock_div_8);
 
   sodaq_wdt_enable(WDT_PERIOD_8X);
-  
   pinMode(3, OUTPUT); digitalWrite(3, HIGH); //gps pin 5 on
   
   pinMode(2, OUTPUT);  // Si5351 off
@@ -89,15 +95,27 @@ void setup()
   digitalWrite(A3, HIGH); 
 
 #ifdef DEBUG_MODE
+  sodaq_wdt_reset();
   debugPort.begin(DEBUG_BAUDRATE);
-  debug("");
-  debug("Power on");
+  debugPort.println(F("Boot"));
+  debugPort.print(F("CALLSIGN: '"));
+  debugPort.print(call);
+  debugPort.println(F("'"));
+  debugI2CScanner();
+
+#ifdef USE_TEST_TIMING
+  debugPort.println(F("Using test timing"));
+#endif
+#ifdef IGNORE_GPS_FIX
+  debugPort.println(F("Ignoring GPS fix and mocking clock"));
+  setTime(00, 01, 45, 11, 3, 2021); // (hr,min,sec,day,month,yr
+  #endif
 #endif
 
   Serial.begin(9600);
-  delay(1000); 
+  delay(1000);
   Serial.write("$PCAS04,1*18\r\n"); //Sets navsystem of the ATGM to GPS only
-  delay(1000); 
+  delay(1000);
 
   noInterrupts(); // Set up Timer1 for interrupts every symbol period.
   TCCR1A = 0;
@@ -109,7 +127,9 @@ void setup()
   OCR1A = WSPR_CTC;
   interrupts();
   sodaq_wdt_reset();
+
   }
+
 
 void loop() {
 	sodaq_wdt_reset();
@@ -118,22 +138,78 @@ void loop() {
 			if (timeStatus() == timeNotSet) // Only sets time if already not done previously
 					{
 				setGPStime();
-				debug(F("GPS time not set"));
 			} // Sets system time to GPS UTC time for sync
+#ifdef IGNORE_GPS_FIX
+//	TXtiming(); // Process timing
+#else
 	if (gps.location.isValid()){
 		TXtiming(); // Process timing
 	}
+#endif
+
 #ifdef DEBUG_MODE
-	char buffer[100];
-	char vcc[5] = {0};
-	dtostrf((board_voltage_mv / 100.0), 4, 2, vcc);
+	// Print info to debug port every second
+	char buffer[90];
+
 	if ((millis() - l_millis) >= 1000){
-		if (second() == 10) debugReadBoardSensors();
+		flip = !flip;
+
+		if (second() % 10 == 0) {
+			debugReadBoardSensors();
+			memset(vcc_str, 0, sizeof(vcc_str));
+			dtostrf((board_voltage_mv / 1000.0), 4, 2, vcc_str);
+		}
 		sprintf(buffer, " %s / %02d:%02d:%02d gps.l.valid=%d speed: %d temp: %d, VCC: %s\r\n",
 				loc4, hour(), minute(), second(),gps.location.isValid(), int(gps.speed.kmph()), board_temperature,
-				vcc);
+				vcc_str);
 		debugPort.write(buffer);
 		l_millis = millis();
+
+//		if (flip) tx_on();
+//		else tx_off();
+
 	}
 #endif
+}
+
+//void loop(){
+//	sodaq_wdt_reset();
+////	tx_on();
+////	delay(250);
+////	tx_off();
+////	delay(250);
+//			TXtiming(); // Process timing
+//
+//}
+
+
+void tx_on() // Turn on the high-side switch, activating the transmitter
+{
+  digitalWrite(2, HIGH);
+  digitalWrite(4, HIGH);
+  digitalWrite(5, HIGH);
+  digitalWrite(6, HIGH);
+  digitalWrite(7, HIGH);
+  delay(2); // buvo 2
+
+  si5351.init(SI5351_CRYSTAL_LOAD_0PF, 27000000, 0); // TCXO 27MHz
+  si5351.set_clock_pwr(SI5351_CLK1, 0);  // Turn off the CLK1 clock
+  si5351.output_enable(SI5351_CLK1, 0);  // Turn off the CLK1 output
+  si5351.set_clock_pwr(SI5351_CLK2, 0);  // Turn off the CLK2 clock
+  si5351.output_enable(SI5351_CLK2, 0);  // Turn off the CLK2 output
+  si5351.drive_strength(SI5351_CLK0, SI5351_DRIVE_8MA); // Set for max power if desired. Check datasheet.
+  si5351.set_freq((WSPR_FREQ * 100),SI5351_CLK0);
+
+}
+
+void tx_off() // Turn off the high-side switch
+{
+  si5351.output_enable(SI5351_CLK0, 0);  // Disable the clock initially
+
+  digitalWrite(2, LOW);
+  digitalWrite(4, LOW);
+  digitalWrite(5, LOW);
+  digitalWrite(6, LOW);
+  digitalWrite(7, LOW);
+
 }

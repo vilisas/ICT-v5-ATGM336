@@ -29,6 +29,10 @@
 # ifndef DEBUG_BAUDRATE
 #  define DEBUG_BAUDRATE 9600
 # endif
+
+// For testing purposes you can ignore gps fix. Locator and timing will be wrong,
+// because of incorrect (unknown) location and time.
+//#define IGNORE_GPS_FIX
 #endif
 
 // debug wspr routines, print symbol timing

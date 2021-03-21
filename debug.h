@@ -8,8 +8,8 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 #include <Arduino.h>
-void debug(const String &tekstas);
 void debugReadBoardSensors();
-
+void debugI2CScanner();
+//#define DEBUG debugPort.println
 
 #endif /* DEBUG_H_ */

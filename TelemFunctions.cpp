@@ -188,10 +188,22 @@ void loc_dbm_telem() // Determine the locator and dBm value for the telemetry tr
 
 void setModeWSPR()
 {
+#ifdef DEBUG_MODE
+	  debugPort.println(F("encoding msg"));
+#endif
   symbol_count = WSPR_SYMBOL_COUNT;
   tone_spacing = WSPR_TONE_SPACING;
   memset(tx_buffer, 0, 255); // Clears Tx buffer from previous operation.
   jtencode.wspr_encode(call, loc4, 10, tx_buffer);
+//    jtencode.wspr_encode(call, "KO24", 10, tx_buffer);
+
+#if defined(DEBUG_MODE) && defined(DEBUG_WSPR)
+  for (int i = 0; i< symbol_count; i++){
+	  if ((i % 30) == 0) debugPort.println();
+	  debugPort.print(tx_buffer[i]);
+	  debugPort.write(' ');
+  }
+#endif
 }
 
 void setModeWSPR_telem()
@@ -207,35 +219,39 @@ void encode() // Loop through the string, transmitting one character at a time
   uint8_t i;
   unsigned long ms, ms_end = millis();
   unsigned long ms_start = millis();
+#ifdef DEBUG_MODE
+  	  debugPort.println(F("sending"));
+#endif
+
   for (i = 0; i < symbol_count; i++) // Now transmit the channel symbols
 {
     //si5351.output_enable(SI5351_CLK0, 1); // Turn off the CLK0 output
     //si5351.set_freq_manual((freq * 100) + (tx_buffer[i] * tone_spacing),87500000000ULL,SI5351_CLK0);
 	si5351.set_freq((freq * 100) + (tx_buffer[i] * tone_spacing),SI5351_CLK0);
     proceed = false;
+#if defined(DEBUG_MODE) && defined(DEBUG_WSPR)
     ms = millis();
-#ifdef DEBUG_MODE
-# ifdef DEBUG_WSPR
     // print debug stuff only, when already tx'ing and there is some spare time to do so
+//    debugPort.print(tx_buffer[i]);	// print encoded channel symbol
+//    debugPort.print(", ");
     debugPort.print(tx_buffer[i] * tone_spacing);	// print offsets to debug port
     debugPort.print(", ");
-    debugPort.println(ms - ms_end);					// print previous cycle length in milliseconds
-# endif
 #endif
 
     while (!proceed);
     sodaq_wdt_reset();
     ms_end = millis();
+#if defined(DEBUG_MODE) && defined(DEBUG_WSPR)
+    debugPort.println(millis()- ms);					// print cycle length in milliseconds
+#endif
+
 }
   si5351.output_enable(SI5351_CLK0, 0); // Turn off the CLK0 output
   si5351.set_clock_pwr(SI5351_CLK0, 0);  // Turn off the CLK0 clock
-#ifdef DEBUG_MODE
-# ifdef DEBUG_WSPR
-  debugPort.print("Cycle length: ");
+#if defined(DEBUG_MODE) && defined(DEBUG_WSPR)
+  debugPort.print(F("Cycle length: "));
   debugPort.print(ms_end - ms_start);
-  debugPort.println(" ms.");
-
-# endif
+  debugPort.println(F(" ms."));
 #endif
 }
 
@@ -246,8 +262,15 @@ void rf_on() // Turn on the high-side switch, activating the transmitter
   digitalWrite(5, HIGH);
   digitalWrite(6, HIGH);
   digitalWrite(7, HIGH);
-  delay(2);
+  delay(100); // buvo 2
+#ifdef DEBUG_MODE
+	debugPort.println(F("Initializing SI5351"));
+#endif
+
   si5351.init(SI5351_CRYSTAL_LOAD_0PF, 27000000, 0); // TCXO 27MHz
+#ifdef DEBUG_MODE
+	debugPort.println(F("Initialized"));
+#endif
   si5351.set_clock_pwr(SI5351_CLK1, 0);  // Turn off the CLK1 clock
   si5351.output_enable(SI5351_CLK1, 0);  // Turn off the CLK1 output
   si5351.set_clock_pwr(SI5351_CLK2, 0);  // Turn off the CLK2 clock
