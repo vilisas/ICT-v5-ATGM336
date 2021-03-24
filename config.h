@@ -14,7 +14,34 @@
 #define CONFIG_CALLSIGN "N0CALL" // set your callsign in local_config.h file
 #endif
 
-#define WSPR_CTC                5336   // CTC value for WSPR - 10672 @ 16Mhz //5336 @ 8Mhz //2668 @ 4Mhz //1334 @ 2Mhz //667 @ 1Mhz
+//#define WSPR_CTC_SET 5336 // CTC value for WSPR - 10672 @ 16Mhz //5336 @ 8Mhz //2668 @ 4Mhz //1334 @ 2Mhz //667 @ 1Mhz
+//
+//// required TX length (seconds)
+//#define WSPR_TX_LENGTH		110		// 110.6
+//// measured TX length (seconds)
+//#define WSPR_TX_LENGTH_MEASURED	110
+//
+//#define WSPR_TX_LENGTH_DIFF_PCT (WSPR_TX_LENGTH_MEASURED / WSPR_TX_LENGTH)
+////time_diff_pct = time_measured / time_req
+//
+//#define WSPR_ADJUSTED_CTC WSPR_CTC_SET + ((WSPR_CTC_SET / 100) * WSPR_TX_LENGTH_DIFF_PCT) - (1/WSPR_CTC_SET)    // 5388
+
+
+/*
+ * WSPR_CTC korekcija:
+ * Turima default reiksme: 5336 prie 8 MHz
+ * WSPR paketo TX trukme: 110 sek - 1:50
+ *
+ * ziurim i debug arba radija ir ismatuojam laika nuo tx pradzios iki pabaigos su isoriniu sekundometru
+ * gaunam pvz 1:48  = 108 sekundes - per greitai issiuncia paketa!
+ * 108 / 110 ~= 0.98(18) %   - tiek reikia pailginti tx trukme, tuo paciu ir simbolio trukme
+ * 5336 + 0.9818% ~= 5388
+ *
+ * 5336 + 0,976491862568 % = 5388
+ *
+ */
+//#define WSPR_CTC                5336   // CTC value for WSPR - 10672 @ 16Mhz //5336 @ 8Mhz //2668 @ 4Mhz //1334 @ 2Mhz //667 @ 1Mhz
+#define WSPR_CTC				5388  // 	korekcija: 0,976491862568%
 #define WSPR_TONE_SPACING       146    // 146 ~1.46 Hz
 
 #define WSPR_FREQ_OFFSET 2111UL
