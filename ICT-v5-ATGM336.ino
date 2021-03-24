@@ -98,6 +98,10 @@ void setup()
   sodaq_wdt_reset();
   debugPort.begin(DEBUG_BAUDRATE);
   debugPort.println(F("Boot"));
+  debugPort.print(F("OSCCAL="));
+  debugPort.println(OSCCAL);
+  debugPort.print(F("WSPR_CTC="));
+  debugPort.println(WSPR_CTC);
   debugPort.print(F("CALLSIGN: '"));
   debugPort.print(call);
   debugPort.println(F("'"));
@@ -140,7 +144,7 @@ void loop() {
 				setGPStime();
 			} // Sets system time to GPS UTC time for sync
 #ifdef IGNORE_GPS_FIX
-//	TXtiming(); // Process timing
+	TXtiming(); // Process timing
 #else
 	if (gps.location.isValid()){
 		TXtiming(); // Process timing
