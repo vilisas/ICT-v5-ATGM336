@@ -7,51 +7,14 @@
 
 #include <Arduino.h>
 #include "config.h"
-
+#include "debug.h"
 #ifdef DEBUG_MODE
 # include <SendOnlySoftwareSerial.h>
 # include <Wire.h>
+# include "Sodaq_wdt.h"
+# include "Si5351_control.h"
+
 extern SendOnlySoftwareSerial debugPort;
-extern int board_temperature;
-extern int board_voltage_mv;
-
-#endif
-
-#ifdef DEBUG_MODE
-
-//long readVcc() {
-//  long result;
-//  // Read 1.1V reference against AVcc
-//  ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-//  delay(2); // Wait for Vref to settle
-//  ADCSRA |= _BV(ADSC); // Convert
-//  while (bit_is_set(ADCSRA,ADSC));
-//  result = ADCL;
-//  result |= ADCH<<8;
-//  result = 1125300L / result; // Back-calculate AVcc in mV
-//  return result;
-//}
-//
-//void debugReadBoardSensors(){
-//	  int wADC = 0;
-////	  int board_temperature = 0;
-////	  float volt = 0;
-////	  int sensorVolt = 0;
-//	  ADMUX = (_BV(REFS1) | _BV(REFS0) | _BV(MUX3));
-//	  ADCSRA |= _BV(ADEN);
-//	  delay(20);
-//	  for (int i=0;i<5;i++)
-//	  {
-//	    ADCSRA |= _BV(ADSC);
-//	    while (bit_is_set(ADCSRA, ADSC));
-//	    wADC = wADC + ADCW;
-//	    delay(20);
-//	  }
-//
-//	  wADC = wADC / 5;
-//	  board_temperature = (wADC - 304.21 ) / 1.124;
-//	  board_voltage_mv = readVcc();
-//}
 
 #endif
 
@@ -108,6 +71,32 @@ void debugI2CScanner()
   digitalWrite(5, LOW);
   digitalWrite(6, LOW);
   digitalWrite(7, LOW);
+
+#endif
+}
+
+void testCW() {
+#ifdef DEBUG_MODE
+	unsigned long freq = WSPR_FREQ - 10000;
+	set_PTT_on(freq);
+	set_tone_on();
+
+	sodaq_wdt_reset();
+	for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < 3000; i += 10) {
+			set_tx_frequency(freq + i);
+			delay(2);
+		}
+		sodaq_wdt_reset();
+		for (int i = 3000; i > 0; i -= 10) {
+			set_tx_frequency(freq + i);
+			delay(2);
+		}
+		sodaq_wdt_reset();
+
+	}
+	set_tone_off();
+	set_PTT_off();
 
 #endif
 }

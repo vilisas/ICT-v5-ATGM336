@@ -234,9 +234,10 @@ void setModeWSPR_telem()
 void encode() // Loop through the string, transmitting one character at a time
 {
   uint8_t i;
+#ifdef DEBUG_MODE
   unsigned long ms, ms_end = millis();
   unsigned long ms_start = millis();
-#ifdef DEBUG_MODE
+
   	  debugPort.println(F("sending"));
 #endif
 
@@ -257,8 +258,8 @@ void encode() // Loop through the string, transmitting one character at a time
 
     while (!proceed);
     sodaq_wdt_reset();
-    ms_end = millis();
 #if defined(DEBUG_MODE) && defined(DEBUG_WSPR)
+    ms_end = millis();
     debugPort.println(millis()- ms);					// print cycle length in milliseconds
 #endif
 

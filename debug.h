@@ -10,6 +10,7 @@
 #include <Arduino.h>
 void debugReadBoardSensors();
 void debugI2CScanner();
+void testCW();
 //#define DEBUG debugPort.println
 
 #endif /* DEBUG_H_ */

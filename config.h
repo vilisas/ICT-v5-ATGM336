@@ -68,4 +68,11 @@
 // uncomment this to enable TX every 2 mins (test timing) or define it in local_config.h
 //#define USE_TEST_TIMING 1
 
+// waterfall painting parameters
+#define PAINT_REPEAT_TIMES 4
+#define PAINT_BIT_DELAY  (2500 / PAINT_REPEAT_TIMES)
+#define PAINT_BIT_WIDTH 200
+
+
+
 #endif /* CONFIG_H_ */

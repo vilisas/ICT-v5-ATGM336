@@ -131,6 +131,7 @@ void setup()
   interrupts();
   sodaq_wdt_reset();
 
+  paint_picture(WSPR_FREQ - 10000);
   }
 
 
@@ -176,14 +177,4 @@ void loop() {
 #endif
 	sleep_mode();// sleep when there is nothing to do. Serial interrupt should wake up
 }
-
-//void loop(){
-//	sodaq_wdt_reset();
-////	tx_on();
-////	delay(250);
-////	tx_off();
-////	delay(250);
-//			TXtiming(); // Process timing
-//
-//}
 
