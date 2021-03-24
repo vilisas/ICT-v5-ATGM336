@@ -119,7 +119,9 @@ void TXtiming() // Timing
 {
 	// run additional scripts here to generate data prior to TX if there is a large delay involved.
 	if ((timeStatus() == timeSet) && (second() == 0) && (minute() >= 0)) {
+#ifdef DEBUG_MODE
 		start_time = millis();
+#endif
 		setGPStime();
 		if ((minute() % 04 == 2) && (second() <= 2)) // TX WSPR standard message // 02, 06
 				{
@@ -136,7 +138,9 @@ void TXtiming() // Timing
 		      rf_on();
 			freq = WSPR_FREQ;
 			setModeWSPR(); // set WSPR standard mode
+#ifdef DEBUG_MODE
 			ms = millis();
+#endif
 			encode(); // begin radio transmission
 //		      debugPort.println(F("Turning RF OFF"));
 		      rf_off(); delay(5);

@@ -19,50 +19,39 @@ extern int board_voltage_mv;
 
 #ifdef DEBUG_MODE
 
-long readVcc() {
-  long result;
-  // Read 1.1V reference against AVcc
-  ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-  delay(2); // Wait for Vref to settle
-  ADCSRA |= _BV(ADSC); // Convert
-  while (bit_is_set(ADCSRA,ADSC));
-  result = ADCL;
-  result |= ADCH<<8;
-  result = 1125300L / result; // Back-calculate AVcc in mV
-  return result;
-}
-
-void debugReadBoardSensors(){
-	  int wADC = 0;
-//	  int board_temperature = 0;
-//	  float volt = 0;
-//	  int sensorVolt = 0;
-	  ADMUX = (_BV(REFS1) | _BV(REFS0) | _BV(MUX3));
-	  ADCSRA |= _BV(ADEN);
-	  delay(20);
-	  for (int i=0;i<5;i++)
-	  {
-	    ADCSRA |= _BV(ADSC);
-	    while (bit_is_set(ADCSRA, ADSC));
-	    wADC = wADC + ADCW;
-	    delay(20);
-	  }
-
-	  wADC = wADC / 5;
-	  board_temperature = (wADC - 304.21 ) / 1.124;
+//long readVcc() {
+//  long result;
+//  // Read 1.1V reference against AVcc
+//  ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+//  delay(2); // Wait for Vref to settle
+//  ADCSRA |= _BV(ADSC); // Convert
+//  while (bit_is_set(ADCSRA,ADSC));
+//  result = ADCL;
+//  result |= ADCH<<8;
+//  result = 1125300L / result; // Back-calculate AVcc in mV
+//  return result;
+//}
+//
+//void debugReadBoardSensors(){
+//	  int wADC = 0;
+////	  int board_temperature = 0;
+////	  float volt = 0;
+////	  int sensorVolt = 0;
+//	  ADMUX = (_BV(REFS1) | _BV(REFS0) | _BV(MUX3));
+//	  ADCSRA |= _BV(ADEN);
 //	  delay(20);
-//	  analogReference(INTERNAL);
 //	  for (int i=0;i<5;i++)
 //	  {
-//	    sensorVolt = sensorVolt + analogRead(3); //analogRead(0) for the old boards
+//	    ADCSRA |= _BV(ADSC);
+//	    while (bit_is_set(ADCSRA, ADSC));
+//	    wADC = wADC + ADCW;
+//	    delay(20);
 //	  }
-////	  sensorVolt = sensorVolt / 5;
-//	  volt = (sensorVolt / 5.0) * 1.1f;
-//	  volt = volt / 1023.0f;
-//	  volt = volt * 4.18f;
-////	  board_voltage_mv = volt * 100;
-	  board_voltage_mv = readVcc();
-}
+//
+//	  wADC = wADC / 5;
+//	  board_temperature = (wADC - 304.21 ) / 1.124;
+//	  board_voltage_mv = readVcc();
+//}
 
 #endif
 

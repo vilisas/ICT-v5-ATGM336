@@ -8,6 +8,7 @@
 #include <JTEncode.h>
 #include <TimeLib.h>
 #include "config.h"
+#include <avr/power.h>
 
 extern TinyGPSPlus gps;
 extern Si5351 si5351;
@@ -36,6 +37,8 @@ extern volatile bool proceed;
 #include "debug.h"
 #include "SendOnlySoftwareSerial.h"
 extern SendOnlySoftwareSerial debugPort;
+extern int board_temperature;
+extern int board_voltage_mv;
 
 #endif
 
@@ -98,37 +101,45 @@ void call_telem() // Determine the telemetry callsign
   call_telemetry[5] = l + 'A';
 }
 
+long readVcc() {
+  long result;
+  // Read 1.1V reference against AVcc
+  ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+  delay(2); // Wait for Vref to settle
+  ADCSRA |= _BV(ADSC); // Convert
+  while (bit_is_set(ADCSRA,ADSC));
+  result = ADCL;
+  result |= ADCH<<8;
+  result = 1125300L / result; // Back-calculate AVcc in mV
+  return result;
+}
+
+int readTemperature(){
+	  int wADC = 0;
+	  ADMUX = (_BV(REFS1) | _BV(REFS0) | _BV(MUX3));
+	  ADCSRA |= _BV(ADEN);
+	  delay(20);
+	  for (int i=0;i<5;i++)
+	  {
+	    ADCSRA |= _BV(ADSC);
+	    while (bit_is_set(ADCSRA, ADSC));
+	    wADC = wADC + ADCW;
+	    delay(20);
+	  }
+
+	  wADC = wADC / 5;
+	  return ((wADC - 304.21 ) / 1.124);
+}
+
 void loc_dbm_telem() // Determine the locator and dBm value for the telemetry transmission
 {
+  power_adc_enable();
   Sats =  gps.satellites.value();
   gps_speed = gps.speed.knots();
-  int wADC = 0;
-  int temp = 0;
-  float volt = 0;
-  int sensorVolt = 0;
-  ADMUX = (_BV(REFS1) | _BV(REFS0) | _BV(MUX3));
-  ADCSRA |= _BV(ADEN);
-  delay(20);
-  for (int i=0;i<5;i++)
-  {
-    ADCSRA |= _BV(ADSC);
-    while (bit_is_set(ADCSRA, ADSC));
-    wADC = wADC + ADCW;
-    delay(20);
-  }
-  
-  wADC = wADC / 5;
-  temp = (wADC - 304.21 ) / 1.124;
-  delay(20);
-  analogReference(INTERNAL);
-  for (int i=0;i<5;i++)
-  {
-    sensorVolt = sensorVolt + analogRead(3); //analogRead(0) for the old boards
-  }
-  sensorVolt = sensorVolt / 5;
-  volt = sensorVolt * 1.1f;
-  volt = volt / 1023.0f;
-  volt = volt * 4.18f;
+  float volt = readVcc() / 1000.0f;
+  int temp = readTemperature();
+  power_adc_disable();
+
   if (volt < 3.0) volt = 3.0;
   if (volt > 4.95) volt = 4.95;
   if (temp < -49) temp = -49;
@@ -184,6 +195,12 @@ void loc_dbm_telem() // Determine the locator and dBm value for the telemetry tr
   else if (dbm_telemetry == 17) dbm_telemetry = 57;
   else if (dbm_telemetry == 18) dbm_telemetry = 60;
   //Serial.println(dbm_telemetry);
+#ifdef DEBUG_MODE
+  board_temperature = temp;
+  board_voltage_mv	= volt * 1000;
+
+#endif
+
 }
 
 void setModeWSPR()

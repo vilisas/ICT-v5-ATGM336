@@ -14,7 +14,9 @@
 #include <TimeLib.h>
 #include <TinyGPS++.h>
 #include <avr/power.h>
+#include <avr/sleep.h>
 #include "debug.h"
+#include "Si5351_control.h"
 #include "config.h"
 
 
@@ -60,10 +62,6 @@ bool flip = false;
 
 ISR(TIMER1_COMPA_vect)
 { proceed = true; }
-
-void tx_on();
-void tx_off();
-
 
 void setup()
 {
@@ -129,6 +127,7 @@ void setup()
            (1 << WGM12);
   TIMSK1 = (1 << OCIE1A);
   OCR1A = WSPR_CTC;
+  power_adc_disable();
   interrupts();
   sodaq_wdt_reset();
 
@@ -159,7 +158,8 @@ void loop() {
 		flip = !flip;
 
 		if (second() % 10 == 0) {
-			debugReadBoardSensors();
+			loc_dbm_telem();
+//			debugReadBoardSensors();
 			memset(vcc_str, 0, sizeof(vcc_str));
 			dtostrf((board_voltage_mv / 1000.0), 4, 2, vcc_str);
 		}
@@ -174,6 +174,7 @@ void loop() {
 
 	}
 #endif
+	sleep_mode();// sleep when there is nothing to do. Serial interrupt should wake up
 }
 
 //void loop(){
@@ -186,34 +187,3 @@ void loop() {
 //
 //}
 
-
-void tx_on() // Turn on the high-side switch, activating the transmitter
-{
-  digitalWrite(2, HIGH);
-  digitalWrite(4, HIGH);
-  digitalWrite(5, HIGH);
-  digitalWrite(6, HIGH);
-  digitalWrite(7, HIGH);
-  delay(2); // buvo 2
-
-  si5351.init(SI5351_CRYSTAL_LOAD_0PF, 27000000, 0); // TCXO 27MHz
-  si5351.set_clock_pwr(SI5351_CLK1, 0);  // Turn off the CLK1 clock
-  si5351.output_enable(SI5351_CLK1, 0);  // Turn off the CLK1 output
-  si5351.set_clock_pwr(SI5351_CLK2, 0);  // Turn off the CLK2 clock
-  si5351.output_enable(SI5351_CLK2, 0);  // Turn off the CLK2 output
-  si5351.drive_strength(SI5351_CLK0, SI5351_DRIVE_8MA); // Set for max power if desired. Check datasheet.
-  si5351.set_freq((WSPR_FREQ * 100),SI5351_CLK0);
-
-}
-
-void tx_off() // Turn off the high-side switch
-{
-  si5351.output_enable(SI5351_CLK0, 0);  // Disable the clock initially
-
-  digitalWrite(2, LOW);
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(6, LOW);
-  digitalWrite(7, LOW);
-
-}
