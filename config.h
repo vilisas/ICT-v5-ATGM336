@@ -62,6 +62,23 @@
 //#define IGNORE_GPS_FIX
 #endif
 
+// Encode valid telemetry channel in local_config.h.
+// It must correspond to flight id and transmitted in valid timeslot. Take a look at:
+// https://hojoham.blogspot.com/2016/10/known-flight-ids.html
+// adjust timeslot in Timing.cpp
+// i.e.:
+// #define TELEMETRY_CHANNEL_1 'Q'
+// #define TELEMETRY_CHANNEL_2 '0'
+
+#ifndef TELEMETRY_CHANNEL_1
+#define TELEMETRY_CHANNEL_1 '0'
+#endif
+
+#ifndef TELEMETRY_CHANNEL_2
+#define TELEMETRY_CHANNEL_2 '0'
+#endif
+
+
 // debug wspr routines, print symbol timing
 //#define DEBUG_WSPR 1
 

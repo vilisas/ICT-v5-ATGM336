@@ -77,8 +77,8 @@ void call_telem() // Determine the telemetry callsign
   char MH[2] = {'A', 'A'};
   MH[0] += ((lon % 200000) / 8333);
   MH[1] += ((lat % 100000) / 4166);
-  call_telemetry[0] = 'Q'; // telemetry channel 11
-  call_telemetry[2] = '3';
+  call_telemetry[0] = TELEMETRY_CHANNEL_1;
+  call_telemetry[2] = TELEMETRY_CHANNEL_2;
 
   int a = MH[0] - 'A';
   int b = MH[1] - 'A';
