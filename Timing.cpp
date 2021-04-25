@@ -17,6 +17,50 @@ unsigned long ms;
 
 #ifndef USE_TEST_TIMING
 
+void sendStandardWSPRMessage() {
+#ifdef DEBUG_MODE
+	debugPort.println(F("Sending WSPR msg"));
+#endif
+	telemetry_set = true;
+	loc4calc(); 		// Get position and update 4-char locator, 6-char locator and last 2 chars of 8-char locator
+	call_telem(); 		// Update WSPR telemetry callsign based on previous information : position and altitude in meters
+	loc_dbm_telem();	// Update WSPR telemetry locator and dbm. Get temperature, voltage, speed in knots, GPS status and sats number
+//      debugPort.println(F("Turning GPS OFF"));
+	GPS_VCC_off();
+	delay(10);
+//      debugPort.println(F("Turning RF ON"));
+	rf_on();
+	freq = WSPR_FREQ;
+	setModeWSPR(); 		// set WSPR standard mode
+	encode(); // begin radio transmission
+//      debugPort.println(F("Turning RF OFF"));
+	rf_off();
+	delay(5);
+//      debugPort.println(F("Turning GPS ON"));
+	GPS_VCC_on();
+}
+
+void sendTelemetryWSPRMessage() {
+#ifdef DEBUG_MODE
+	debugPort.println(F("Sending WSPR telemetry msg"));
+#endif
+//        debugPort.println(F("Turning GPS OFF"));
+	GPS_VCC_off();
+	delay(10);
+	rf_on();
+//      debugPort.println(F("Turning RF ON"));
+	freq = WSPR_FREQ;
+	setModeWSPR_telem(); 	// set WSPR telemetry mode
+	encode(); 				// begin radio transmission
+//      debugPort.println(F("Turning RF OFF"));
+	rf_off();
+	delay(5);
+//      debugPort.println(F("Turning GPS ON"));
+	GPS_VCC_on();
+
+}
+
+
 void TXtiming() // Timing
 {
 	// run additional scripts here to generate data prior to TX if there is a large delay involved.
@@ -24,90 +68,25 @@ void TXtiming() // Timing
 		setGPStime();
 		if ((minute() % 10 == 0) && (second() <= 0)) // TX WSPR standard message
 				{
-#ifdef DEBUG_MODE
-			debugPort.println(F("Sending standard WSPR message #1"));
-#endif
-			telemetry_set = true;
-			loc4calc(); // Get position and update 4-char locator, 6-char locator and last 2 chars of 8-char locator
-			call_telem(); // Update WSPR telemetry callsign based on previous information : position and altitude in meters
-			loc_dbm_telem(); // Update WSPR telemetry locator and dbm. Get temperature, voltage, speed in knots, GPS status and sats number
-//      debugPort.println(F("Turning GPS OFF"));
-			GPS_VCC_off();
-			delay(10);
-//      debugPort.println(F("Turning RF ON"));
-			rf_on();
-			freq = WSPR_FREQ;
-			setModeWSPR(); // set WSPR standard mode
-			encode(); // begin radio transmission
-//      debugPort.println(F("Turning RF OFF"));
-			rf_off();
-			delay(5);
-//      debugPort.println(F("Turning GPS ON"));
-			GPS_VCC_on();
+			sendStandardWSPRMessage();
 		}
 
 		else if ((minute() % 10 == 2) && (second() <= 0)
-				&& (telemetry_set == true))    // TX WSPR telemetry message
+				&& (telemetry_set == true))    		// TX WSPR standard message
 				{
-#ifdef DEBUG_MODE
-			debugPort.println(F("Sending WSPR telemetry message"));
-#endif
-//        debugPort.println(F("Turning GPS OFF"));
-			GPS_VCC_off();
-			delay(10);
-			rf_on();
-//      debugPort.println(F("Turning RF ON"));
-			freq = WSPR_FREQ;
-			setModeWSPR_telem(); // set WSPR telemetry mode
-			encode(); // begin radio transmission
-//      debugPort.println(F("Turning RF OFF"));
-			rf_off();
-			delay(5);
-//      debugPort.println(F("Turning GPS ON"));
-			GPS_VCC_on();
+			sendStandardWSPRMessage();
 		}
 
 		else if ((minute() % 10 == 4) && (second() <= 0)
-				&& (telemetry_set == true))    // TX WSPR standard message
+				&& (telemetry_set == true))    		// TX WSPR telemetry message
 				{
-#ifdef DEBUG_MODE
-			debugPort.println(F("Sending standard WSPR message #2"));
-#endif
-//        debugPort.println(F("Turning GPS OFF"));
-			GPS_VCC_off();
-			delay(10);
-//        debugPort.println(F("Turning RF ON"));
-			rf_on();
-			freq = WSPR_FREQ;
-			setModeWSPR(); // set WSPR standard mode
-			encode(); // begin radio transmission
-//      debugPort.println(F("Turning RF OFF"));
-			rf_off();
-			delay(5);
-//      debugPort.println(F("Turning GPS ON"));
-			GPS_VCC_on();
+			sendTelemetryWSPRMessage();
 		}
 
-		else if ((minute() % 10 == 6) && (second() <= 0)
-				&& (telemetry_set == true))    // TX WSPR standard message
+		else if ((minute() % 10 == 8) && (second() <= 0)
+				&& (telemetry_set == true))    		// TX WSPR standard message
 				{
-#ifdef DEBUG_MODE
-			debugPort.println(F("Sending standard WSPR message #3"));
-#endif
-//        debugPort.println(F("Turning GPS OFF"));
-			GPS_VCC_off();
-			delay(10);
-//        debugPort.println(F("Turning RF ON"));
-			rf_on();
-			freq = WSPR_FREQ;
-			setModeWSPR(); // set WSPR standard mode
-			encode(); // begin radio transmission
-//      debugPort.println(F("Turning RF OFF"));
-			rf_off();
-			delay(5);
-//      debugPort.println(F("Turning GPS ON"));
-			GPS_VCC_on();
-			telemetry_set = false;
+			sendStandardWSPRMessage();
 		}
 	}
 }

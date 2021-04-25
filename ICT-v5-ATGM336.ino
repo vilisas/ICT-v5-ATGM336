@@ -131,7 +131,7 @@ void setup()
   interrupts();
   sodaq_wdt_reset();
 
-  paint_picture(WSPR_FREQ - 10000);
+//  paint_picture(WSPR_FREQ - 10000);
   }
 
 
