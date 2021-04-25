@@ -3,6 +3,8 @@
 #include "TelemFunctions.h"
 #include "config.h"
 #include "debug.h"
+#include "Si5351_control.h"
+
 extern unsigned long freq;
 extern bool telemetry_set;
 
@@ -66,25 +68,31 @@ void TXtiming() // Timing
 	// run additional scripts here to generate data prior to TX if there is a large delay involved.
 	if ((timeStatus() == timeSet) && (second() == 0) && (minute() >= 0)) {
 		setGPStime();
-		if ((minute() % 10 == 0) && (second() <= 0)) // TX WSPR standard message
+		if ((minute() % 10 == 0) && (second() <= 1)) // do not tx before new cycle (pos+telemetry)
+				{
+//			sendStandardWSPRMessage();
+		}
+
+		else if ((minute() % 10 == 2) && (second() <= 1)) // TX WSPR standard message
 				{
 			sendStandardWSPRMessage();
 		}
 
-		else if ((minute() % 10 == 2) && (second() <= 0)
-				&& (telemetry_set == true))    		// TX WSPR standard message
+		else if ((minute() % 10 == 4) && (second() <= 1))
 				{
-			sendStandardWSPRMessage();
-		}
-
-		else if ((minute() % 10 == 4) && (second() <= 0)
-				&& (telemetry_set == true))    		// TX WSPR telemetry message
+					if 	(telemetry_set == true){    		// TX WSPR telemetry message only if call sent at least once
+						sendTelemetryWSPRMessage();
+					} else {
+						sendStandardWSPRMessage();			// and send standard msg if not
+					}
+		} else if ((minute() % 10 == 6) && (second() <= 1)) // TX WSPR standard message
 				{
-			sendTelemetryWSPRMessage();
-		}
-
-		else if ((minute() % 10 == 8) && (second() <= 0)
-				&& (telemetry_set == true))    		// TX WSPR standard message
+			if (minute() % 6 == 2) { // 26, 56 min expect easter eggs 10 kHz lower
+				paint_picture(WSPR_FREQ - 10000);
+			} else {
+				sendStandardWSPRMessage();
+			}
+		} else if ((minute() % 10 == 8) && (second() <= 1)) // TX WSPR standard message
 				{
 			sendStandardWSPRMessage();
 		}
